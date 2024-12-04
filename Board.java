@@ -17,6 +17,7 @@ public class Board {
         this.addCell(4, 4, 1);
     }
 
+    // コマを置く
     public void addCell(int row, int col, int color) {
         // 盤内かどうかの判定
         if (col < 0 || col >= 8 || row < 0 || row >= 8) {
@@ -31,7 +32,19 @@ public class Board {
         }
 
         this.board[col][row] = color;
-        this.visBoard[col][row] = (color == 1) ? "⚪︎" : "⚫️";
+        this.visBoard[col][row] = (color == 0) ? "⚪︎" : "⚫️";
+    }
+
+    // コマをひっくり返す
+    public void reverse(int row, int col) {
+        // 盤内かどうかの判定
+        if (visBoard[col][row] == null) {
+            System.err.println("選択された位置が盤外です");
+            return;
+        }
+
+        this.board[col][row] = (this.board[col][row] == 0) ? 1 : 0;
+        this.visBoard[col][row] = (this.board[col][row] == 0) ? "⚪︎" : "⚫️";
     }
 
     public String toString() {
