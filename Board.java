@@ -12,11 +12,15 @@ public class Board {
     private int whiteNum = 0;
     private int blackNum = 0;
 
+    private Position[][][] reverseList = new Position[8][8][27];
+    private int[][] revCnts = new int[8][8];
+
     public Board() {
         this.addCell(3, 3, 1);
         this.addCell(3, 4, -1);
         this.addCell(4, 3, -1);
         this.addCell(4, 4, 1);
+        this.checkReverse(-1);
         this.setNums();
     }
 
@@ -35,7 +39,7 @@ public class Board {
         }
 
         // 駒が置かれていないかどうかの判定
-        if (visBoard[col][row] != null) {
+        if (board[col][row] != 0) {
             System.err.println("すでに駒が置かれています");
             return false;
         }
@@ -71,43 +75,51 @@ public class Board {
         if (!canPutCell(row, col)) {
             return false;
         }
+        checkReverse(color);
 
+        if (this.revCnts[col][row] > 0) {
+            Position[] posList = this.reverseList[col][row];
+            for (int i = 0; i < revCnts[col][row]; i++) {
+                reverse(posList[i].getRow(), posList[i].getCol());
+            }
+            addCell(row, col, color);
+            return true;
+        }
+        System.err.println("ひっくり返せないところには置けません");
+        return false;
+    }
+
+    public void checkReverse(int color) {
         int[][] mvs = {
                 { 0, 1 }, { 1, 1 }, { 1, 0 }, { 0, -1 }, { -1, -1 }, { -1, 0 }, { 1, -1 }, { -1, 1 } // 移動方向
         };
-        boolean canReversed = false;
 
-        for (int[] mv : mvs) {
-            int newCol = col, newRow = row;
-            ArrayList<Position> reverseList = new ArrayList<>();
-            while (true) {
-                newCol += mv[0];
-                newRow += mv[1];
-
-                if (newCol < 0 || newCol >= 8 || newRow < 0 || newRow >= 8) {
-                    break;
-                }
-                if (this.board[newCol][newRow] + color == 0) {
-                    reverseList.add(new Position(newCol, newRow));
-                }
-                if (this.board[newCol][newRow] == color) {
-                    if (reverseList.size() > 0) {
-                        canReversed = true;
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                int revCnt = 0; // そのますにおいた時にひっくり返せるコマの数
+                for (int[] mv : mvs) {
+                    int newCol = i, newRow = j;
+                    ArrayList<Position> revList = new ArrayList<>();
+                    while (true) {
+                        newCol += mv[0];
+                        newRow += mv[1];
+                        if (newCol < 0 || newCol >= 8 || newRow < 0 || newRow >= 8 || board[newCol][newRow] == 0) {
+                            break;
+                        }
+                        if (this.board[newCol][newRow] + color == 0) {
+                            revList.add(new Position(newCol, newRow));
+                        }
+                        if (this.board[newCol][newRow] == color) {
+                            for (Position pos : revList) {
+                                this.reverseList[i][j][revCnt] = pos;
+                                revCnt++;
+                            }
+                            break;
+                        }
                     }
-                    for (Position pos : reverseList) {
-                        this.reverse(pos.getRow(), pos.getCol());
-                    }
-                    break;
                 }
+                this.revCnts[i][j] = revCnt;
             }
-        }
-        if (!canReversed) {
-            System.err.println("コマをひっくり返せないためコマをおけません");
-            return false;
-        } else {
-            this.addCell(row, col, color);
-            setNums();
-            return true;
         }
     }
 
