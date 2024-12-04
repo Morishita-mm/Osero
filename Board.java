@@ -9,12 +9,15 @@ public class Board {
 
     private int[][] board = new int[8][8];
     private String[][] visBoard = new String[8][8];
+    private int whiteNum = 0;
+    private int blackNum = 0;
 
     public Board() {
         this.addCell(3, 3, 1);
         this.addCell(3, 4, -1);
         this.addCell(4, 3, -1);
         this.addCell(4, 4, 1);
+        this.setNums();
     }
 
     // コマを置く
@@ -103,7 +106,67 @@ public class Board {
             return false;
         } else {
             this.addCell(row, col, color);
+            setNums();
             return true;
         }
     }
+
+    // それぞれの色のコマの数を数え上げる
+    public void setNums() {
+        // nums[ blackNum, whiteNum]
+        int[] nums = { 0, 0 };
+        for (int[] rows : this.board) {
+            for (int row : rows) {
+                if (row == 1) {
+                    nums[0]++;
+                } else if (row == -1) {
+                    nums[1]++;
+                }
+            }
+        }
+        this.blackNum = nums[0];
+        this.whiteNum = nums[1];
+    }
+
+    public boolean isGameEnd() {
+        if (this.whiteNum == 0 || this.blackNum == 0 || this.blackNum + this.whiteNum == 64) {
+            return true;
+        }
+        return false;
+    }
+
+    public int checkWinner() {
+        if (this.blackNum == this.whiteNum) {
+            return 0;
+        }
+        return (this.blackNum > this.whiteNum) ? 1 : -1;
+    }
+
+    public void showWinner() {
+        int winner = checkWinner();
+        switch (winner) {
+            case 0:
+                System.out.println("Draw");
+                break;
+            case 1:
+                System.out.println("⚫️ WIN!!!");
+                break;
+            case -1:
+                System.out.println("⚪︎ WIN!!!");
+                break;
+            default:
+                System.out.println("Error");
+                break;
+        }
+        System.out.printf("Result: ⚪︎ %d : %d ⚫️\n", whiteNum, blackNum);
+    }
+
+    public int getBlackNum() {
+        return blackNum;
+    }
+
+    public int getWhiteNum() {
+        return whiteNum;
+    }
+
 }
