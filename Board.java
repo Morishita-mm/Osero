@@ -21,6 +21,7 @@ public class Board {
         this.addCell(4, 3, -1);
         this.addCell(4, 4, 1);
         this.checkReverse(-1);
+        this.updateVisual();
         this.setNums();
     }
 
@@ -53,7 +54,6 @@ public class Board {
             return;
         }
         this.board[col][row] = (this.board[col][row] == 1) ? -1 : 1;
-        this.visBoard[col][row] = (this.board[col][row] == 1) ? "⚫️" : "⚪︎";
     }
 
     public String toString() {
@@ -75,8 +75,6 @@ public class Board {
         if (!canPutCell(row, col)) {
             return false;
         }
-        checkReverse(color);
-
         if (this.revCnts[col][row] > 0) {
             Position[] posList = this.reverseList[col][row];
             for (int i = 0; i < revCnts[col][row]; i++) {
@@ -87,6 +85,27 @@ public class Board {
         }
         System.err.println("ひっくり返せないところには置けません");
         return false;
+    }
+
+    public void updateVisual() {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (revCnts[i][j] <= 0) {
+                    this.visBoard[i][j] = null;
+                } else {
+                    this.visBoard[i][j] = "✅";
+                }
+
+                switch (board[i][j]) {
+                    case 1:
+                        this.visBoard[i][j] = "⚫️";
+                        break;
+                    case -1:
+                        this.visBoard[i][j] = "⚪︎";
+                }
+
+            }
+        }
     }
 
     public void checkReverse(int color) {

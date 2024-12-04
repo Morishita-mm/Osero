@@ -21,6 +21,8 @@ public class main {
                 if (board.putCell(row, col, color)) {
                     color = (color == 1) ? -1 : 1;
                     // board.reverse(row, col);
+                    board.checkReverse(color);
+                    board.updateVisual();
                     System.out.println(board);
                     if (board.isGameEnd()) {
                         board.showWinner();
